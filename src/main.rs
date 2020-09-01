@@ -8,7 +8,7 @@ fn main() {
     let select = SelectView::<String>::new()
         .on_submit(on_submit)
         .with_name("select")
-        .fixed_size((20, 12));
+        .fixed_width(20);
     let buttons = LinearLayout::vertical()
         .child(Button::new("Add new", add_name))
         .child(Button::new("Delete", delete_name))
