@@ -1,6 +1,9 @@
 use cursive::traits::*;
 use cursive::views::{Button, Dialog, DummyView, EditView, LinearLayout, SelectView};
 use cursive::Cursive;
+use std::time::SystemTime;
+
+use chrono::prelude::*;
 
 fn main() {
     let mut siv = cursive::default();
@@ -22,21 +25,34 @@ fn main() {
                 .child(DummyView)
                 .child(buttons),
         )
-        .title("Morning meeting"),
+        .title("Morning meeting")
+        .with_name("main_dialog"),
     );
 
-    siv.run();
+    siv.refresh();
+    while siv.is_running() {
+        // let date = Local::now();
+        // siv.call_on_name("main_dialog", |view: &mut Dialog| {
+        //     view.set_title(format!("Time: {}", date.format("%H:%M:%S")));
+        // });
+        siv.step();
+    }
 }
 
 fn add_name(s: &mut Cursive) {
     fn ok(s: &mut Cursive, name: &str) {
         let formatted_name = format!("[ ] - {}", name);
+        let mut num_attendees = 0usize;
         s.call_on_name("select", |view: &mut SelectView<String>| {
-            view.add_item_str(&formatted_name)
+            view.add_item_str(&formatted_name);
+            num_attendees = view.len();
         });
         s.pop_layer();
-    }
 
+        s.call_on_name("main_dialog", |view: &mut Dialog| {
+            view.set_title(format!("Morning meeting - {} attendees", num_attendees));
+        });
+    }
     s.add_layer(
         Dialog::around(
             EditView::new()
@@ -65,9 +81,14 @@ fn delete_name(s: &mut Cursive) {
             select.remove_item(focus);
         }
     }
+
+    s.call_on_name("main_dialog", |view: &mut Dialog| {
+        view.set_title(format!("Morning meeting - {} attendees", select.len()));
+    });
 }
 
 fn on_submit(s: &mut Cursive, name: &str) {
+    s.screen_mut();
     let mut select = s.find_name::<SelectView<String>>("select").unwrap();
     match select.selected_id() {
         None => s.add_layer(Dialog::info("No name to remove")),
@@ -80,7 +101,9 @@ fn on_submit(s: &mut Cursive, name: &str) {
             } else {
                 new_string = new_string.replace("[X]", "[ ]");
             }
-            select.insert_item_str(focus, &new_string)
+            select.insert_item_str(focus, &new_string);
+            select.set_selection(focus);
+            ()
         }
     }
 }
