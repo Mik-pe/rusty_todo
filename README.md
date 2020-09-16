@@ -1,4 +1,4 @@
-Rusty Todo
+Rusty Todo 🔊
 ---
 
 This _Rusty todo_ terminal gui can be used for distance morning meetings, where one designated person keeps track of the attendees and is able to "pass the ball around the table".
