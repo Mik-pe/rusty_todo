@@ -28,10 +28,6 @@ fn main() {
     siv.add_global_callback('c', on_clear);
     siv.refresh();
     while siv.is_running() {
-        // let date = Local::now();
-        // siv.call_on_name("main_dialog", |view: &mut Dialog| {
-        //     view.set_title(format!("Time: {}", date.format("%H:%M:%S")));
-        // });
         siv.step();
     }
 }
