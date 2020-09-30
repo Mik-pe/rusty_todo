@@ -1,6 +1,8 @@
 use cursive::traits::*;
 use cursive::views::{Button, Dialog, DummyView, EditView, LinearLayout, SelectView};
 use cursive::Cursive;
+use rand::thread_rng;
+use rand::seq::SliceRandom;
 
 fn main() {
     let mut siv = cursive::default();
@@ -11,6 +13,7 @@ fn main() {
         .fixed_width(20);
     let buttons = LinearLayout::vertical()
         .child(Button::new("Add new", add_name))
+        .child(Button::new("Scramble", scramble))
         .child(Button::new("Delete", delete_name))
         .child(DummyView)
         .child(Button::new("Quit", Cursive::quit));
@@ -26,6 +29,10 @@ fn main() {
         .with_name("main_dialog"),
     );
     siv.add_global_callback('c', on_clear);
+    siv.add_global_callback('d', delete_name);
+    siv.add_global_callback('a', add_name);
+    siv.add_global_callback(cursive::event::Key::Del, delete_name);
+
     siv.refresh();
     while siv.is_running() {
         siv.step();
@@ -66,6 +73,14 @@ fn add_name(s: &mut Cursive) {
             s.pop_layer();
         }),
     );
+}
+
+fn scramble(s: &mut Cursive) {
+    let mut select = s.find_name::<SelectView<String>>("select").unwrap();
+    let mut items : Vec<String> = select.iter_mut().map(|(_, text)| { text.clone() }).collect();
+    items.shuffle(&mut thread_rng());
+    select.clear();
+    select.add_all_str(items);
 }
 
 fn delete_name(s: &mut Cursive) {
